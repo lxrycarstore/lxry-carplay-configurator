@@ -1,3 +1,15 @@
+import {
+  fetchAutos,
+  fetchAutoDashboards,
+  fetchDashboardTypes,
+  fetchOplossingen
+} from './airtable';
+
+import { matchesYearRange } from './yearRangeHelper';
+import type { ConfiguratorModel } from '../types/configurator';
+
+
+
 import { fetchProducts } from './airtable';
 import type { ConfiguratorData, ConfiguratorOption, ConfiguratorQuote, ConfiguratorSelection } from '../types/configurator';
 
@@ -74,3 +86,52 @@ export const calculateQuote = (
 
   return { total, items };
 };
+
+
+export const getConfiguratorModels = async (
+  merk?: string,
+  bouwjaar?: number
+): Promise<ConfiguratorModel[]> => {
+  try {
+    const autos = await fetchAutos();
+    const dashboards = await fetchAutoDashboards();
+    const types = await fetchDashboardTypes();
+    const oplossingen = await fetchOplossingen();
+
+    const filteredAutos = autos.filter((auto) => {
+      if (merk && auto.merk !== merk) return false;
+      if (bouwjaar !== undefined) {
+        return matchesYearRange(bouwjaar, auto.jaarVan ?? null, auto.jaarTot ?? null);
+      }
+      return true;
+    });
+
+    const models: ConfiguratorModel[] = filteredAutos.map((auto) => ({
+      id: auto.id,
+      merk: auto.merk,
+      model: auto.model,
+      generatie: auto.generatie ?? null,
+      jaarVan: auto.jaarVan ?? null,
+      jaarTot: auto.jaarTot ?? null
+    }));
+
+    return models;
+  } catch (error) {
+    console.warn('Airtable failed, using demo fallback', error);
+
+    // Fallback: derive basic models from demoOptions
+    const demoModels: ConfiguratorModel[] = [
+      {
+        id: 'demo',
+        merk: 'Demo',
+        model: 'Demo Model',
+        generatie: null,
+        jaarVan: null,
+        jaarTot: null
+      }
+    ];
+
+    return demoModels;
+  }
+};
+
