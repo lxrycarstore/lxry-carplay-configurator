@@ -1,5 +1,9 @@
 import type { Request, Response } from 'express';
-import { calculateQuote, getConfiguratorData } from '../services/configurator';
+import {
+  calculateQuote,
+  getConfiguratorData,
+  getConfiguratorModels
+} from '../services/configurator';
 
 export const getOptions = async (_req: Request, res: Response) => {
   const data = await getConfiguratorData();
@@ -13,6 +17,23 @@ export const postQuote = async (req: Request, res: Response) => {
 
   res.status(200).json({
     quote,
+    generatedAt: new Date().toISOString()
+  });
+};
+
+export const getModels = async (req: Request, res: Response) => {
+  const { merk, bouwjaar } = req.query;
+
+  const parsedYear =
+    typeof bouwjaar === 'string' ? parseInt(bouwjaar, 10) : undefined;
+
+  const models = await getConfiguratorModels(
+    typeof merk === 'string' ? merk : undefined,
+    parsedYear
+  );
+
+  res.status(200).json({
+    models,
     generatedAt: new Date().toISOString()
   });
 };
