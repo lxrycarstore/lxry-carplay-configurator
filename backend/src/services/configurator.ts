@@ -1,5 +1,5 @@
-import { fetchProducts } from './airtable.js';
-import type { ConfiguratorData, ConfiguratorOption, ConfiguratorQuote, ConfiguratorSelection } from '../types/configurator.js';
+import { fetchProducts } from './airtable';
+import type { ConfiguratorData, ConfiguratorOption, ConfiguratorQuote, ConfiguratorSelection } from '../types/configurator';
 
 const demoOptions: ConfiguratorOption[] = [
   {

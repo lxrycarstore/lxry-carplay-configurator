@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import { configuratorRouter } from './routes/configurator.js';
+import { configuratorRouter } from './routes/configurator';
 
 export const createServer = () => {
   const app = express();

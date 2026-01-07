@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { calculateQuote, getConfiguratorData } from '../services/configurator.js';
+import { calculateQuote, getConfiguratorData } from '../services/configurator';
 
 export const getOptions = async (_req: Request, res: Response) => {
   const data = await getConfiguratorData();

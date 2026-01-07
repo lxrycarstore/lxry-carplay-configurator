@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getOptions, postQuote } from '../controllers/configurator.js';
+import { getOptions, postQuote } from '../controllers/configurator';
 
 export const configuratorRouter = Router();
 
