@@ -1,11 +1,44 @@
-import type {
-  AirtableListResponse,
-  ProductRecord,
-  AutoRecord,
-  AutoDashboardRecord,
-  DashboardTypeRecord,
-  OplossingRecord
-} from '../types/configurator.js';
+// Types definities
+export interface AirtableListResponse<T> {
+  records: { id: string; fields: T }[];
+  offset?: string;
+}
+
+export interface ProductRecord {
+  Name: string;
+  Price: number;
+  Category: string;
+}
+
+export interface AutoRecord {
+  id: string;
+  merk: string;
+  model: string;
+  generatie: string | null;
+  jaarVan: number | null;
+  jaarTot: number | null;
+}
+
+export interface AutoDashboardRecord {
+  id: string;
+  autoId: string | null;
+  dashboardTypeId: string | null;
+}
+
+export interface DashboardTypeRecord {
+  id: string;
+  naam: string;
+  herkenningsfoto: any | null;
+}
+
+export interface OplossingRecord {
+  id: string;
+  autoDashboardId: string | null;
+  type: string;
+  prijs: number;
+  afbeelding: any | null;
+  omschrijving: string | null;
+}
 
 const AIRTABLE_API_URL = 'https://api.airtable.com/v0';
 
