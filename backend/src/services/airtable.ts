@@ -1,5 +1,4 @@
 import type {
-  AirtableListResponse,
   ProductRecord,
   AutoRecord,
   AutoDashboardRecord,
@@ -11,65 +10,56 @@ const AIRTABLE_API_URL = 'https://api.airtable.com/v0';
 
 const getEnv = (key: string) => {
   const value = process.env[key];
-  if (!value) {
-    throw new Error(`Missing environment variable: ${key}`);
-  }
+  if (!value) throw new Error(`Missing environment variable: ${key}`);
   return value;
 };
 
-/* -------------------------------------------------- */
-/* Existing demo product fetch (unchanged)           */
-/* -------------------------------------------------- */
-
-export const fetchProducts = async () => {
-  const apiKey = getEnv('AIRTABLE_API_KEY');
-  const baseId = getEnv('AIRTABLE_BASE_ID');
-  const table = getEnv('AIRTABLE_TABLE');
-
-  const url = `${AIRTABLE_API_URL}/${baseId}/${encodeURIComponent(table)}`;
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${apiKey}` }
-  });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(`Airtable error: ${response.status} ${message}`);
-  }
-
-  const data = (await response.json()) as AirtableListResponse<ProductRecord>;
-  return data.records;
-};
-
-/* -------------------------------------------------- */
-/* Generic Airtable helper (THIS WAS MISSING)         */
-/* -------------------------------------------------- */
+/* ======================================================
+   GENERIC FETCH HELPER
+====================================================== */
 
 const fetchTable = async (tableName: string) => {
   const apiKey = getEnv('AIRTABLE_API_KEY');
   const baseId = getEnv('AIRTABLE_BASE_ID');
 
   const url = `${AIRTABLE_API_URL}/${baseId}/${encodeURIComponent(tableName)}`;
+
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${apiKey}` }
   });
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(`Airtable error (${tableName}): ${response.status} ${message}`);
+    const msg = await response.text();
+    throw new Error(`Airtable error (${tableName}): ${response.status} ${msg}`);
   }
 
   const data = await response.json();
   return data.records as { id: string; fields: any }[];
 };
 
-/* -------------------------------------------------- */
-/* Configurator Airtable queries                      */
-/* -------------------------------------------------- */
+/* ======================================================
+   PRODUCTEN / OPLOSSINGEN
+====================================================== */
+
+export const fetchProducts = async (): Promise<ProductRecord[]> => {
+  const table = getEnv('AIRTABLE_OPLOSSINGEN_TABLE');
+  const records = await fetchTable(table);
+
+  return records.map(r => ({
+    id: r.id,
+    fields: r.fields
+  }));
+};
+
+/* ======================================================
+   AUTO
+====================================================== */
 
 export const fetchAutos = async (): Promise<AutoRecord[]> => {
-  const records = await fetchTable('Auto');
+  const table = getEnv('AIRTABLE_AUTO_TABLE');
+  const records = await fetchTable(table);
 
-  return records.map((r) => ({
+  return records.map(r => ({
     id: r.id,
     merk: r.fields['Merk'],
     model: r.fields['Model'],
@@ -79,30 +69,45 @@ export const fetchAutos = async (): Promise<AutoRecord[]> => {
   }));
 };
 
-export const fetchAutoDashboards = async (): Promise<AutoDashboardRecord[]> => {
-  const records = await fetchTable('AutoDashboards');
+/* ======================================================
+   AUTO → DASHBOARDS
+====================================================== */
 
-  return records.map((r) => ({
+export const fetchAutoDashboards = async (): Promise<AutoDashboardRecord[]> => {
+  const table = getEnv('AIRTABLE_AUTODASHBOARDS_TABLE');
+  const records = await fetchTable(table);
+
+  return records.map(r => ({
     id: r.id,
     autoId: r.fields['Auto']?.[0] ?? null,
     dashboardTypeId: r.fields['DashboardType']?.[0] ?? null
   }));
 };
 
-export const fetchDashboardTypes = async (): Promise<DashboardTypeRecord[]> => {
-  const records = await fetchTable('DashboardTypes');
+/* ======================================================
+   DASHBOARD TYPES
+====================================================== */
 
-  return records.map((r) => ({
+export const fetchDashboardTypes = async (): Promise<DashboardTypeRecord[]> => {
+  const table = getEnv('AIRTABLE_DASHBOARDTYPES_TABLE');
+  const records = await fetchTable(table);
+
+  return records.map(r => ({
     id: r.id,
     naam: r.fields['Naam'],
     herkenningsfoto: r.fields['Herkenningsfoto'] ?? null
   }));
 };
 
-export const fetchOplossingen = async (): Promise<OplossingRecord[]> => {
-  const records = await fetchTable('Oplossingen');
+/* ======================================================
+   OPLOSSINGEN
+====================================================== */
 
-  return records.map((r) => ({
+export const fetchOplossingen = async (): Promise<OplossingRecord[]> => {
+  const table = getEnv('AIRTABLE_OPLOSSINGEN_TABLE');
+  const records = await fetchTable(table);
+
+  return records.map(r => ({
     id: r.id,
     autoDashboardId: r.fields['AutoDashboard']?.[0] ?? null,
     type: r.fields['OplossingType'],
