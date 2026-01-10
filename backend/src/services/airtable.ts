@@ -4,7 +4,7 @@ import type {
   AutoDashboardRecord,
   DashboardTypeRecord,
   OplossingRecord
-} from '../types/configurator.js';
+} from '../types/configurator';
 
 const AIRTABLE_API_URL = 'https://api.airtable.com/v0';
 
@@ -33,7 +33,7 @@ const fetchTable = async (tableName: string) => {
     throw new Error(`Airtable error (${tableName}): ${response.status} ${msg}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { records: { id: string; fields: any }[] };
   return data.records as { id: string; fields: any }[];
 };
 
