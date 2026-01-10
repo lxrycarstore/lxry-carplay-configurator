@@ -5,9 +5,17 @@ export interface AirtableListResponse<T> {
 }
 
 export interface ProductRecord {
-  Name: string;
-  Price: number;
-  Category: string;
+  id: string;
+  fields: {
+    Name: string;
+    Price: number;
+    Category: string;
+    Description?: string;
+    ImageUrl?: string;
+    CompatibleModels?: string[];
+  };
+}
+
 }
 
 export interface AutoRecord {
