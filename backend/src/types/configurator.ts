@@ -1,4 +1,5 @@
 // Types definities
+
 export interface AirtableListResponse<T> {
   records: { id: string; fields: T }[];
   offset?: string;
@@ -14,8 +15,6 @@ export interface ProductRecord {
     ImageUrl?: string;
     CompatibleModels?: string[];
   };
-}
-
 }
 
 export interface AutoRecord {
